@@ -6,6 +6,7 @@ use bookmark::Bookmark;
 use entry::Entry;
 use refs::{BookmarkMut, BookmarkRef};
 
+/// A store for bookmarks and other entries.
 pub struct Store {
     pub entries: Vec<Option<Entry>>,
     pub bookmark_index: Vec<usize>,
@@ -30,6 +31,7 @@ impl Store {
         self.add(Bookmark { name, url, tags })
     }
 
+    /// Iterate over all bookmarks in the store
     pub fn iter(&self) -> impl Iterator<Item = BookmarkRef> + '_ {
         self.bookmark_index.iter().filter_map(move |&id| {
             self.entries[id]
@@ -128,6 +130,7 @@ mod tests {
     fn test_get() {
         let store = mock_store();
 
+        // Ensure the bookmarks were added correctly
         let bookmark = store.get(0).unwrap();
         assert_eq!(bookmark.id, 0);
         assert_eq!(bookmark.name, "Rust");
@@ -142,10 +145,12 @@ mod tests {
         let mut store = mock_store();
 
         {
+            // Modify the bookmark name
             let mut bookmark = store.get_mut(0).unwrap();
             bookmark.name = "Rust Programming".to_string();
         }
 
+        // Ensure the change is persisted
         let bookmark = store.get(0).unwrap();
         assert_eq!(bookmark.name, "Rust Programming");
     }
@@ -154,6 +159,7 @@ mod tests {
     fn test_remove() {
         let mut store = mock_store();
 
+        // Remove the first bookmark
         let bookmark = store.remove(0).unwrap();
         assert_eq!(bookmark.name, "Rust");
 

@@ -3,11 +3,13 @@ use super::{Command, Dispatch};
 pub fn run(dispatch: &mut Dispatch, args: &[String]) -> Result<(), String> {
     match args.len() {
         0 => {
+            // Print all commands
             for command in dispatch.commands() {
                 println!("{} - {}", command.name, command.description);
             }
         }
         1 => {
+            // Print usage for a specific command
             let name = &args[0];
             let command = dispatch.commands().iter().find(|c| c.name == name);
 

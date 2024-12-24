@@ -7,31 +7,37 @@ pub struct Bookmark {
 }
 
 impl Bookmark {
-    /// Create a new bookmark
-    pub fn new(name: String, url: String, tags: Vec<String>) -> Self {
+     /// Create a new bookmark.
+     pub fn new(name: String, url: String, tags: Vec<String>) -> Self {
         Self { name, url, tags }
     }
 
+    /// Return the bookmark's name.
     pub fn name(&self) -> &str {
         &self.name
     }
 
+    /// Return the bookmark's URL.
     pub fn url(&self) -> &str {
         &self.url
     }
 
+    /// Return the bookmark's tags.
     pub fn tags(&self) -> &[String] {
         &self.tags
     }
 
+    /// Sets the bookmark's name.
     pub fn set_name(&mut self, name: String) {
         self.name = name;
     }
 
+    /// Sets the bookmark's URL.
     pub fn set_url(&mut self, url: String) {
         self.url = url;
     }
 
+    /// Sets the bookmark's tags.
     pub fn set_tags(&mut self, tags: Vec<String>) {
         self.tags = tags;
     }
