@@ -1,4 +1,7 @@
-use std::{fmt::Display, ops::{Deref, DerefMut}};
+use std::{
+    fmt::Display,
+    ops::{Deref, DerefMut},
+};
 
 use super::Bookmark;
 

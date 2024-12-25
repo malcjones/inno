@@ -3,10 +3,10 @@ pub mod entry;
 pub mod refs;
 
 use std::{
+    collections::HashMap,
     fs::File,
     io::{BufRead, BufReader, BufWriter, Write},
     path::Path,
-    collections::HashMap,
 };
 
 use anyhow::{Context, Result};
@@ -54,10 +54,8 @@ impl Store {
     pub fn save(&self, path: impl AsRef<Path>) -> Result<()> {
         let mut writer = BufWriter::new(File::create(path)?);
 
-        for entry in &self.entries {
-            if let Some(entry) = entry {
-                writeln!(writer, "{}", entry)?;
-            }
+        for entry in self.entries.iter().flatten() {
+            writeln!(writer, "{}", entry)?;
         }
 
         Ok(())
@@ -129,12 +127,7 @@ impl Store {
     pub fn find_by_tag(&self, tag: &str) -> Vec<BookmarkRef> {
         self.tag_index
             .get(tag)
-            .map(|bookmark_ids| {
-                bookmark_ids
-                    .iter()
-                    .filter_map(|&id| self.get(id))
-                    .collect()
-            })
+            .map(|bookmark_ids| bookmark_ids.iter().filter_map(|&id| self.get(id)).collect())
             .unwrap_or_default()
     }
 

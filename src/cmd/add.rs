@@ -1,5 +1,5 @@
-use anyhow::Result;
 use super::{Command, Dispatch};
+use anyhow::Result;
 
 pub fn run(dispatch: &mut Dispatch, args: &[String]) -> Result<()> {
     if args.len() < 2 {

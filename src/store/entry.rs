@@ -8,7 +8,7 @@ use super::Bookmark;
 pub enum Entry {
     Bookmark(Bookmark),
     Comment(String),
-    Empty
+    Empty,
 }
 
 impl Entry {
@@ -65,16 +65,17 @@ impl FromStr for Entry {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let line = s.trim();
 
-        if line.starts_with('#') {
-            return Ok(Entry::Comment(line[1..].trim().to_string()));
+        if let Some(comment) = line.strip_prefix('#') {
+            return Ok(Entry::Comment(comment.trim().to_string()));
         }
 
         if line.is_empty() {
             return Ok(Entry::Empty);
         }
 
-        let Some((name_part, url_part)) = line.split_once(':')
-            else { return Err(EntryParseError::MissingSeparator(line.to_string())); };
+        let Some((name_part, url_part)) = line.split_once(':') else {
+            return Err(EntryParseError::MissingSeparator(line.to_string()));
+        };
 
         let name = name_part.trim().to_string();
         if name.is_empty() {
@@ -92,8 +93,9 @@ impl FromStr for Entry {
             }
             url = extracted_url.to_string();
 
-            let Some(end_index) = url_part.rfind(']')
-                else { return Err(EntryParseError::MissingClosingBracket); };
+            let Some(end_index) = url_part.rfind(']') else {
+                return Err(EntryParseError::MissingClosingBracket);
+            };
 
             let tags_str = &url_part[start_index + 1..end_index].trim();
             if !tags_str.is_empty() {

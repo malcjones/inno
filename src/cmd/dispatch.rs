@@ -1,4 +1,4 @@
-use anyhow::{Result, Context};
+use anyhow::{Context, Result};
 use rustyline::{DefaultEditor, error::ReadlineError};
 
 use super::Command;
@@ -74,7 +74,7 @@ impl Dispatch {
     /// Returns an error string if no command is provided or if command execution fails.
     pub fn run_line(&mut self, line: &str) -> Result<()> {
         let tokens = shlex::Shlex::new(line).collect::<Vec<_>>();
-        let command = tokens.get(0).context("No command provided")?;
+        let command = tokens.first().context("No command provided")?;
         let args = &tokens[1..];
         self.run(command, args)
     }
@@ -117,7 +117,7 @@ impl Dispatch {
             }
 
             // Attempt to parse and run the command
-            if let Err(e) = self.run_line(&line) {
+            if let Err(e) = self.run_line(line) {
                 eprintln!("{}", e);
             }
         }

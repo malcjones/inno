@@ -1,5 +1,5 @@
-use anyhow::{Result, Context};
 use super::{Command, Dispatch};
+use anyhow::{Context, Result};
 
 pub fn run(dispatch: &mut Dispatch, args: &[String]) -> Result<()> {
     match args {
