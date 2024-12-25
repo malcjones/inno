@@ -1,8 +1,9 @@
+use anyhow::Result;
 use super::{Command, Dispatch};
 
-pub fn run(dispatch: &mut Dispatch, args: &[String]) -> Result<(), String> {
+pub fn run(dispatch: &mut Dispatch, args: &[String]) -> Result<()> {
     if args.len() < 2 {
-        return Err("Not enough arguments".to_string());
+        anyhow::bail!("Invalid arguments");
     }
 
     let name = &args[0];

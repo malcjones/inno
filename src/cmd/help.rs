@@ -1,21 +1,22 @@
+use anyhow::Result;
 use super::{Command, Dispatch};
 
-pub fn run(dispatch: &mut Dispatch, args: &[String]) -> Result<(), String> {
-    match args.len() {
-        0 => {
-            // Print all commands
+pub fn run(dispatch: &mut Dispatch, args: &[String]) -> Result<()> {
+    match args {
+        [] => {
+            println!("Available commands:");
             for command in dispatch.commands() {
-                println!("{} - {}", command.name, command.description);
+                println!("  {:<10} {}", command.name, command.description);
             }
         }
-        1 => {
-            // Print usage for a specific command
-            let name = &args[0];
-            let command = dispatch.commands().iter().find(|c| c.name == name);
-
-            println!("Usage: {}", command.map_or("Unknown command", |c| c.usage));
+        [name] => {
+            if let Some(command) = dispatch.command(name) {
+                println!("Usage: {} {}", command.name, command.usage);
+            } else {
+                eprintln!("Unknown command: {}", name);
+            }
         }
-        _ => return Err("Too many arguments".to_string()),
+        _ => anyhow::bail!("Invalid arguments"),
     }
 
     Ok(())

@@ -1,3 +1,4 @@
+use anyhow::{Result, Context};
 use rustyline::{DefaultEditor, error::ReadlineError};
 
 use super::Command;
@@ -25,6 +26,11 @@ impl Dispatch {
         }
     }
 
+    /// Returns a reference to the command with the given name.
+    pub fn command(&self, name: &str) -> Option<&'static Command> {
+        self.commands.iter().find(|c| c.name == name).copied()
+    }
+
     /// Returns a slice of all commands available in this dispatch.
     pub fn commands(&self) -> &[&'static Command] {
         &self.commands
@@ -50,10 +56,10 @@ impl Dispatch {
     /// # Errors
     ///
     /// Returns an error string if the command is not found or if the command handler fails.
-    pub fn run(&mut self, command_name: &str, args: &[String]) -> Result<(), String> {
+    pub fn run(&mut self, command_name: &str, args: &[String]) -> Result<()> {
         match self.commands.iter().find(|c| c.name == command_name) {
             Some(command) => (command.run)(self, args),
-            None => Err(format!("Command '{}' not found", command_name)),
+            None => anyhow::bail!("Command '{}' not found", command_name),
         }
     }
 
@@ -66,9 +72,9 @@ impl Dispatch {
     /// # Errors
     ///
     /// Returns an error string if no command is provided or if command execution fails.
-    pub fn run_line(&mut self, line: &str) -> Result<(), String> {
+    pub fn run_line(&mut self, line: &str) -> Result<()> {
         let tokens = shlex::Shlex::new(line).collect::<Vec<_>>();
-        let command = tokens.get(0).ok_or("No command provided")?;
+        let command = tokens.get(0).context("No command provided")?;
         let args = &tokens[1..];
         self.run(command, args)
     }
@@ -79,10 +85,8 @@ impl Dispatch {
     ///
     /// Returns any `ReadlineError` that occurs during input reading.
     pub fn take_line(&mut self) -> Result<String, ReadlineError> {
-        static PROMPT: &str = ">>> ";
-
         // Read a line from the user
-        let line = self.editor.readline(PROMPT)?;
+        let line = self.editor.readline("ℂ ")?;
 
         // Add the line to the history
         self.editor.add_history_entry(&line)?;
@@ -90,14 +94,22 @@ impl Dispatch {
         Ok(line)
     }
 
+    /// Prints a message of the day (MOTD) to the user.
+    fn motd() {
+        println!("Welcome to inno, a command-line bookmark manager.");
+        println!("Type 'help' for a list of available commands.");
+    }
+
     /// Starts the main read-eval-print loop (REPL) for this dispatch.
     ///
     /// # Errors
     ///
     /// Returns an error string if reading from input fails unexpectedly.
-    pub fn start(&mut self) -> Result<(), String> {
+    pub fn start(&mut self) -> Result<()> {
+        Dispatch::motd();
+
         loop {
-            let line = self.take_line().map_err(|e| e.to_string())?;
+            let line = self.take_line().map_err(|e| anyhow::anyhow!(e))?;
             let line = line.trim();
 
             if line.is_empty() {

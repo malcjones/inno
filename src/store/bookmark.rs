@@ -7,8 +7,8 @@ pub struct Bookmark {
 }
 
 impl Bookmark {
-     /// Create a new bookmark.
-     pub fn new(name: String, url: String, tags: Vec<String>) -> Self {
+    /// Create a new bookmark.
+    pub fn new(name: String, url: String, tags: Vec<String>) -> Self {
         Self { name, url, tags }
     }
 
@@ -40,6 +40,13 @@ impl Bookmark {
     /// Sets the bookmark's tags.
     pub fn set_tags(&mut self, tags: Vec<String>) {
         self.tags = tags;
+    }
+
+    /// Checks if the bookmark matches a fuzzy query.
+    pub fn matches(&self, query: &str) -> bool {
+        self.to_string()
+            .to_lowercase()
+            .contains(&query.to_lowercase())
     }
 }
 
